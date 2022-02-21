@@ -46,6 +46,9 @@ impl Command for DescribeDF {
                             Value::test_string("25%"),
                             Value::test_string("50%"),
                             Value::test_string("75%"),
+                            Value::test_string("90%"),
+                            Value::test_string("95%"),
+                            Value::test_string("99%"),
                             Value::test_string("max"),
                         ],
                     ),
@@ -62,6 +65,9 @@ impl Command for DescribeDF {
                             Value::test_float(1.0),
                             Value::test_float(1.0),
                             Value::test_float(1.0),
+                            Value::test_float(1.0),
+                            Value::test_float(1.0),
+                            Value::test_float(1.0),
                         ],
                     ),
                     Column::new(
@@ -72,6 +78,9 @@ impl Command for DescribeDF {
                             Value::test_float(1.0),
                             Value::test_float(1.0),
                             Value::test_float(0.0),
+                            Value::test_float(1.0),
+                            Value::test_float(1.0),
+                            Value::test_float(1.0),
                             Value::test_float(1.0),
                             Value::test_float(1.0),
                             Value::test_float(1.0),
@@ -117,6 +126,9 @@ fn command(
             Some("25%"),
             Some("50%"),
             Some("75%"),
+            Some("90%"),
+            Some("95%"),
+            Some("99%"),
             Some("max"),
         ],
     )
@@ -192,6 +204,33 @@ fn command(
                     _ => None,
                 });
 
+            let q_90 = col
+                .quantile_as_series(0.90)
+                .ok()
+                .and_then(|ca| ca.cast(&DataType::Float64).ok())
+                .and_then(|ca| match ca.get(0) {
+                    AnyValue::Float64(v) => Some(v),
+                    _ => None,
+                });
+
+            let q_95 = col
+                .quantile_as_series(0.95)
+                .ok()
+                .and_then(|ca| ca.cast(&DataType::Float64).ok())
+                .and_then(|ca| match ca.get(0) {
+                    AnyValue::Float64(v) => Some(v),
+                    _ => None,
+                });
+
+            let q_99 = col
+                .quantile_as_series(0.99)
+                .ok()
+                .and_then(|ca| ca.cast(&DataType::Float64).ok())
+                .and_then(|ca| match ca.get(0) {
+                    AnyValue::Float64(v) => Some(v),
+                    _ => None,
+                });
+
             let max = col
                 .max_as_series()
                 .cast(&DataType::Float64)
@@ -214,6 +253,9 @@ fn command(
                     q_25,
                     q_50,
                     q_75,
+                    q_90,
+                    q_95,
+                    q_99,
                     max,
                 ],
             )
